@@ -69,9 +69,14 @@ while True:
 	
 	#Use inRange to find values between aMin and aMax, print to grayscale
 	bw = cv2.inRange(hsv, aMin, aMax)
+	#Erode bw
+	kernel = np.ones((3,3),np.uint8)
+	bw = cv2.erode(bw,kernel,iterations =1)
+	#Dialate bw
+	dilation = cv2.dilate(img,kernel,iterations =1)
 	cv2.imshow('Tracker', bw)
 	
-	#Exit on 'q' press
+	#Exit on keyboard 'q' press
 	k = cv2.waitKey(33)
 	if k == ord('q'):
 		break
