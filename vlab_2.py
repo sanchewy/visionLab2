@@ -1,29 +1,58 @@
 # Vision Lab 2	   Keinan Balsam
-def change_slider(value):
-    pass
-	#print(do something)
 
+#Define imports
 import cv2
 import numpy as np
 
+#Define numpy arrays for min/max 
+aMin = np.array([0,0,0])
+aMax = np.array([255,255,255])
+
+#Define slider action listeners
+def change_red_min(value):
+	aMin[0] = value
+def change_red_max(value):
+    aMax[0] = value
+def change_green_min(value):
+	aMin[1] = value
+def change_green_max(value):
+    aMax[1] = value
+def change_blue_min(value):
+	aMin[2] = value
+def change_blue_max(value):
+    aMax[2] = value
+
+#Define video capture
 cap = cv2.VideoCapture(0)
+
+#Define windows
 cv2.namedWindow('Video', cv2.WINDOW_AUTOSIZE)
 cv2.namedWindow('Sliders', cv2.WINDOW_AUTOSIZE)
-cv2.namedWindow('Frame', cv2.WINDOW_NORMAL)
-#cv2.resizeWindow('Video', 600, 600)
-#cv2.resizeWindow('Frame', 600, 600)
-#cv2.resizeWindow('Sliders', 600, 600)
-cv2.createTrackbar('Red', 'Sliders', 255, 255, change_slider)
-cv2.createTrackbar('Green', 'Sliders', 255, 255, change_slider)
-cv2.createTrackbar('Blue', 'Sliders', 255, 255, change_slider)
+cv2.namedWindow('Frame', cv2.WINDOW_AUTOSIZE)
 
+#Define sliders
+cv2.createTrackbar('red_min', 'Sliders', 255, 255, change_red_min)
+cv2.createTrackbar('red_max', 'Sliders', 255, 255, change_red_max)
+cv2.createTrackbar('green_min', 'Sliders', 255, 255, change_green_min)
+cv2.createTrackbar('green_max', 'Sliders', 255, 255, change_green_max)
+cv2.createTrackbar('blue_min', 'Sliders', 255, 255, change_blue_min)
+cv2.createTrackbar('blue_max', 'Sliders', 255, 255, change_blue_max)
+
+#Function sets sliders to left click location
 def get_mouse(event,x,y,flags,param):
-    if event == cv2.EVENT_LBUTTONDOWN:
-        px = frame[y ,x]
-        print(px)
-        
+	if event == cv2.EVENT_LBUTTONDOWN:
+		px = frame[y ,x]
+		cv2.setTrackbarPos('red_min','Sliders',px[0])
+		cv2.setTrackbarPos('red_max','Sliders',px[0])
+		cv2.setTrackbarPos('green_min','Sliders',px[1])
+		cv2.setTrackbarPos('green_max','Sliders',px[1])
+		cv2.setTrackbarPos('blue_min','Sliders',px[2])
+		cv2.setTrackbarPos('blue_max','Sliders',px[2])
+		
+#Define mouse click callback method
 cv2.setMouseCallback('Frame',get_mouse)
 
+#Define main run loop
 while True:
 	ret, frame = cap.read()
 	frame = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
