@@ -8,6 +8,9 @@ import numpy as np
 aMin = np.array([0,0,0])
 aMax = np.array([255,255,255])
 
+#This value will be automatically inserted between the min/max values.
+threshold = 30
+
 #Define slider action listeners
 def change_red_min(value):
 	aMin[0] = value
@@ -43,12 +46,12 @@ cv2.createTrackbar('blue_max', 'Sliders', 255, 255, change_blue_max)
 def get_mouse(event,x,y,flags,param):
 	if event == cv2.EVENT_LBUTTONDOWN:
 		px = hsv[y ,x]
-		cv2.setTrackbarPos('red_min','Sliders',px[0])
-		cv2.setTrackbarPos('red_max','Sliders',px[0])
-		cv2.setTrackbarPos('green_min','Sliders',px[1])
-		cv2.setTrackbarPos('green_max','Sliders',px[1])
-		cv2.setTrackbarPos('blue_min','Sliders',px[2])
-		cv2.setTrackbarPos('blue_max','Sliders',px[2])
+		cv2.setTrackbarPos('red_min','Sliders',px[0]-threshold)
+		cv2.setTrackbarPos('red_max','Sliders',px[0]+threshold)
+		cv2.setTrackbarPos('green_min','Sliders',px[1]-threshold)
+		cv2.setTrackbarPos('green_max','Sliders',px[1]+threshold)
+		cv2.setTrackbarPos('blue_min','Sliders',px[2]-threshold)
+		cv2.setTrackbarPos('blue_max','Sliders',px[2]+threshold)
 		
 #Define mouse click callback method
 cv2.setMouseCallback('HSV',get_mouse)
