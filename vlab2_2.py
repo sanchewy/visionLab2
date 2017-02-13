@@ -9,12 +9,13 @@ cap = cv2.VideoCapture(0)
 
 #Define windows
 cv2.namedWindow('Video', cv2.WINDOW_AUTOSIZE)
-cv2.namedWindow('Equalize', cv2.WINDOW_AUTOSIZE)
+cv2.namedWindow('Equalize/Blur/32Bit', cv2.WINDOW_AUTOSIZE)
 
 #Define main funciton runloop
 while True:
 	#Set up BRG live video
 	status, img = cap.read()
+	img = cv2.resize(img, (0,0), fx=0.5, fy=0.5)
 	cv2.imshow('Video', img)
 	
 	#Create new frame and brighten
@@ -24,7 +25,7 @@ while True:
 	
 	#Now blur equalize and turn 32 bit
 	kernel = np.ones((5,5),np.float32)/25
-	dst = cv2.filter2D(equalize,-1,kernel)
+	equalize = cv2.filter2D(equalize,-1,kernel)
 	cv2.imshow('Equalize', equalize)
 	
 	#Exit on keyboard 'q' press
