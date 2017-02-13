@@ -35,23 +35,24 @@ cv2.namedWindow('HSV', cv2.WINDOW_AUTOSIZE)
 cv2.namedWindow('Tracker', cv2.WINDOW_AUTOSIZE)
 
 #Define sliders
-cv2.createTrackbar('red_min', 'Sliders', 255, 255, change_red_min)
-cv2.createTrackbar('red_max', 'Sliders', 255, 255, change_red_max)
-cv2.createTrackbar('green_min', 'Sliders', 255, 255, change_green_min)
-cv2.createTrackbar('green_max', 'Sliders', 255, 255, change_green_max)
-cv2.createTrackbar('blue_min', 'Sliders', 255, 255, change_blue_min)
-cv2.createTrackbar('blue_max', 'Sliders', 255, 255, change_blue_max)
+cv2.createTrackbar('red_min', 'Sliders', 0, 255, change_red_min)
+cv2.createTrackbar('red_max', 'Sliders', 0, 255, change_red_max)
+cv2.createTrackbar('green_min', 'Sliders', 0, 255, change_green_min)
+cv2.createTrackbar('green_max', 'Sliders', 0, 255, change_green_max)
+cv2.createTrackbar('blue_min', 'Sliders', 0, 255, change_blue_min)
+cv2.createTrackbar('blue_max', 'Sliders', 0, 255, change_blue_max)
 
 #Function sets sliders to left click location
 def get_mouse(event,x,y,flags,param):
 	if event == cv2.EVENT_LBUTTONDOWN:
 		px = hsv[y ,x]
-		cv2.setTrackbarPos('red_min','Sliders',px[0]-threshold)
-		cv2.setTrackbarPos('red_max','Sliders',px[0]+threshold)
-		cv2.setTrackbarPos('green_min','Sliders',px[1]-threshold)
-		cv2.setTrackbarPos('green_max','Sliders',px[1]+threshold)
-		cv2.setTrackbarPos('blue_min','Sliders',px[2]-threshold)
-		cv2.setTrackbarPos('blue_max','Sliders',px[2]+threshold)
+		print(px)
+		cv2.setTrackbarPos('red_min','Sliders',px[0]-30 if (px[0]-30)>0 else 0)
+		cv2.setTrackbarPos('red_max','Sliders',px[0]+30 if (px[0]+30)<255 else 255)
+		cv2.setTrackbarPos('green_min','Sliders',px[1]-30 if (px[1]-30)>0 else 0)
+		cv2.setTrackbarPos('green_max','Sliders',px[1]+30 if (px[1]+30)<255 else 255)
+		cv2.setTrackbarPos('blue_min','Sliders',px[2]-30 if (px[2]-30)>0 else 0)
+		cv2.setTrackbarPos('blue_max','Sliders',px[2]+30 if (px[2]+30)<255 else 255)
 		
 #Define mouse click callback method
 cv2.setMouseCallback('HSV',get_mouse)
@@ -69,9 +70,11 @@ while True:
 	
 	#Use inRange to find values between aMin and aMax, print to grayscale
 	bw = cv2.inRange(hsv, aMin, aMax)
+
 	#Erode bw
 	kernel = np.ones((3,3),np.uint8)
 	bw = cv2.erode(bw,kernel,iterations =1)
+
 	#Dialate bw
 	dilation = cv2.dilate(img,kernel,iterations =1)
 	cv2.imshow('Tracker', bw)
@@ -80,5 +83,6 @@ while True:
 	k = cv2.waitKey(33)
 	if k == ord('q'):
 		break
+
 cap.release()
 cv2.destroyAllWindows()
