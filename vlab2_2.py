@@ -6,27 +6,54 @@ import numpy as np
 
 #Define video capture
 cap = cv2.VideoCapture(0)
-
-#Define windows
-cv2.namedWindow('Video', cv2.WINDOW_AUTOSIZE)
-cv2.namedWindow('Equalize/Blur/32Bit', cv2.WINDOW_AUTOSIZE)
+_,img = cap.read()
+avg = np.float32(img)
 
 #Define main funciton runloop
 while True:
 	#Set up BRG live video
-	status, img = cap.read()
-	img = cv2.resize(img, (0,0), fx=0.5, fy=0.5)
-	cv2.imshow('Video', img)
+	_,img = cap.read()
+	cv2.imshow('Origional', img)
+	
+	#Now take accumulateWeighted running average
+	cv2.accumulateWeighted(img, avg, .1)
+	
+	#ConvertScaleAbs back to 8 bit
+	res = cv2.convertScaleAbs(avg)
+	
+	#Take absolute difference
+	res = cv2.absdiff(img, res)
+	cv2.imshow('ABSDifference', res)
+	
+	#Turn grayscale
+	res = cv2.cvtColor(res, cv2.COLOR_BGR2GRAY)
+	
+	#Threshold low
+	_,thresh1 = cv2.threshold(res.copy(),50, 255, cv2.THRESH_BINARY)
+	cv2.imshow('Threshold low', thresh1)
+	
+	#Now blur
+	thresh1 = cv2.GaussianBlur(thresh1, (21, 21), 0)
+	
+	#Threshold high
+	_,thresh2 = cv2.threshold(thresh1, 200, 255, cv2.THRESH_BINARY)
+	cv2.imshow('Threshold high', thresh2)
+	
+	#Find contours
+	_,cnts,_ = cv2.findContours(thresh2, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
+	cnts = sorted(cnts, key = cv2.contourArea, reverse = False)
+	screenCnt = None
+	imgcont = img.copy()
+	for c in cnts:
+		#peri = cv2.arcLength(c, True)
+		#approx = cv2.approxPolyDP(c, 0.02 * peri, True)
+		cv2.drawContours(imgcont, c, 0, (0,255,0), 3)
+	cv2.imshow("Contours", imgcont)
 	
 	#Create new frame and brighten
 	imgyuv = cv2.cvtColor(img, cv2.COLOR_BGR2YUV)
 	imgyuv[:,:,0] = cv2.equalizeHist(imgyuv[:,:,0])
 	equalize = cv2.cvtColor(imgyuv, cv2.COLOR_YUV2BGR)
-	
-	#Now blur equalize and turn 32 bit
-	kernel = np.ones((5,5),np.float32)/25
-	equalize = cv2.filter2D(equalize,-1,kernel)
-	cv2.imshow('Equalize', equalize)
 	
 	#Exit on keyboard 'q' press
 	k = cv2.waitKey(33)
