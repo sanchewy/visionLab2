@@ -16,38 +16,40 @@ while True:
 	cv2.imshow('Origional', img)
 	
 	#Now take accumulateWeighted running average
-	cv2.accumulateWeighted(img, avg, .1)
+	res = cv2.accumulateWeighted(img, avg, .1)
 	
 	#ConvertScaleAbs back to 8 bit
-	res = cv2.convertScaleAbs(avg)
+	res = cv2.convertScaleAbs(res)
 	
 	#Take absolute difference
-	res = cv2.absdiff(img, res)
+	res = cv2.absdiff(res, img)
 	cv2.imshow('ABSDifference', res)
 	
 	#Turn grayscale
 	res = cv2.cvtColor(res, cv2.COLOR_BGR2GRAY)
 	
 	#Threshold low
-	_,thresh1 = cv2.threshold(res.copy(),50, 255, cv2.THRESH_BINARY)
+	_,thresh1 = cv2.threshold(res.copy(),20, 255, cv2.THRESH_BINARY)
 	cv2.imshow('Threshold low', thresh1)
 	
 	#Now blur
 	thresh1 = cv2.GaussianBlur(thresh1, (21, 21), 0)
 	
 	#Threshold high
-	_,thresh2 = cv2.threshold(thresh1, 200, 255, cv2.THRESH_BINARY)
+	_,thresh2 = cv2.threshold(thresh1, 100, 255, cv2.THRESH_BINARY)
 	cv2.imshow('Threshold high', thresh2)
 	
 	#Find contours
-	_,cnts,_ = cv2.findContours(thresh2, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
+	_,cnts,_ = cv2.findContours(thresh2, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
 	cnts = sorted(cnts, key = cv2.contourArea, reverse = False)
 	screenCnt = None
 	imgcont = img.copy()
-	for c in cnts:
+	if len(cnts) > 0:
+		cv2.drawContours(imgcont, cnts, -1, (0,255,0),3)
+	#for c in cnts:
 		#peri = cv2.arcLength(c, True)
 		#approx = cv2.approxPolyDP(c, 0.02 * peri, True)
-		cv2.drawContours(imgcont, c, 0, (0,255,0), 3)
+		#cv2.drawContours(imgcont, c, 0, (0,255,0), 3)
 	cv2.imshow("Contours", imgcont)
 	
 	#Create new frame and brighten
