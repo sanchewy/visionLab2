@@ -61,11 +61,11 @@ while True:
 	#Draw rectangles around any existing contours
 	if len(cnts) > 0:
 		for cnts1 in cnts:
-			#if(cv2.contourArea(cnts1) > 1000):
 				rect = cv2.boundingRect(cnts1)
 				p1 = (rect[0], rect[1])
 				p2 = (rect[0] + rect[2], rect[1] + rect[3])
-				cv2.rectangle(imgcont, p1, p2, (255,0,0),1)
+				if((rect[2]*rect[3]) > 9000):
+					cv2.rectangle(imgcont, p1, p2, (0,255,0),1)
 	cv2.imshow("Contours", imgcont)
 	
 	#Create new frame and brighten
